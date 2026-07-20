@@ -172,6 +172,13 @@
     width: 100%;
     max-width: 520px;
   }
+  .modal .vtitle {
+    text-align: center;
+    font-weight: 900;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+  }
+  .modal .vtitle .t { color: var(--good); font-variant-numeric: tabular-nums; }
   .modal iframe {
     width: 100%;
     aspect-ratio: 9 / 14;
@@ -219,6 +226,7 @@
 
 <div class="modal" id="modal">
   <div class="box">
+    <div class="vtitle" id="videoTitle"></div>
     <iframe id="videoFrame" allow="autoplay; fullscreen" allowfullscreen></iframe>
     <button class="close" id="closeModal">Zapri</button>
   </div>
@@ -436,7 +444,7 @@ function render(list) {
       a.textContent = "▶ video";
       if (preview) {
         a.href = "#";
-        a.onclick = (ev) => { ev.preventDefault(); openVideo(preview); };
+        a.onclick = (ev) => { ev.preventDefault(); openVideo(preview, e.name, e.seconds); };
       } else {
         a.href = extUrl;
         a.target = "_blank";
@@ -450,7 +458,14 @@ function render(list) {
   });
 }
 
-function openVideo(src) {
+function openVideo(src, name, seconds) {
+  const t = $("videoTitle");
+  t.textContent = "";
+  t.append(name + " — ");
+  const span = document.createElement("span");
+  span.className = "t";
+  span.textContent = formatTime(seconds);
+  t.append(span);
   $("videoFrame").src = src;
   $("modal").classList.add("open");
 }
