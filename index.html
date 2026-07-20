@@ -140,6 +140,38 @@
   }
   .row .watch:active { transform: scale(.96); }
 
+  .rules {
+    margin-top: 22px;
+    background: var(--panel);
+    border: 1px solid #232738;
+    border-radius: var(--radius);
+    padding: 4px 16px;
+  }
+  .rules summary {
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 1rem;
+    padding: 12px 0;
+    list-style: none;
+  }
+  .rules summary::-webkit-details-marker { display: none; }
+  .rules summary::after {
+    content: "▾";
+    float: right;
+    color: var(--muted);
+    transition: transform .2s;
+  }
+  .rules[open] summary::after { transform: rotate(180deg); }
+  .rules ol {
+    margin: 2px 0 14px;
+    padding-left: 20px;
+    color: var(--muted);
+    font-size: .92rem;
+    line-height: 1.65;
+  }
+  .rules ol li { margin-bottom: 8px; }
+  .rules ol b { color: var(--text); }
+
   .empty, .error {
     text-align: center;
     color: var(--muted);
@@ -218,6 +250,18 @@
   <div class="board" id="board">
     <div class="empty">Nalagam čase…</div>
   </div>
+  <details class="rules">
+    <summary>📜 Pravila</summary>
+    <ol>
+      <li><b>Start:</b> začneš v pravilnem startnem položaju — obe roki na startnem grifu. Čas začne teči v trenutku, ko spustiš startni grif.</li>
+      <li><b>Cilj:</b> čas se ustavi, ko vzpostaviš kontrolo nad zadnjim (top) grifom z <b>obema rokama</b>. Dotik ni dovolj — top mora biti pod kontrolo.</li>
+      <li><b>Samo svoji grifi:</b> uporabiš lahko samo grife svojega balvana. Dotik ali pomoč z drugimi grifi = <b>neveljaven poskus</b>.</li>
+      <li><b>Brez dabov:</b> dotik tal ali sosednje stene med plezanjem = dab = poskus ne šteje.</li>
+      <li><b>Video:</b> posnetek mora <b>brez rezov</b> zajeti celoten poskus od starta do topa, plezalec mora biti ves čas viden. Čas se odčita iz posnetka.</li>
+      <li><b>Poskusi:</b> število poskusov je neomejeno — šteje tvoj najboljši veljaven čas.</li>
+      <li>Organizator pregleda vsak video; njegova odločitev je dokončna. 🤝</li>
+    </ol>
+  </details>
   <footer>
     Čas šteje šele, ko organizator preveri video.<br>
     Prikazan je najboljši čas vsakega plezalca. Srečno. 🧗
