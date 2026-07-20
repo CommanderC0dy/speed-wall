@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Speed Wall — Lestvica</title>
+<style>
+  /* ============================================================
+     CONFIG IS IN THE <script> AT THE BOTTOM — set SHEET_CSV_URL
+     ============================================================ */
+  :root {
+    --bg: #0e0f13;
+    --panel: #171922;
+    --panel-2: #1e2130;
+    --text: #f2f3f7;
+    --muted: #9aa0b4;
+    --accent: #ffd23f;      /* chalk-bag yellow */
+    --accent-2: #ff5d3b;    /* hold orange */
+    --good: #4ade80;
+    --radius: 14px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
+    padding-bottom: 60px;
+  }
+
+  header {
+    padding: 28px 16px 18px;
+    text-align: center;
+    background:
+      radial-gradient(ellipse 120% 80% at 50% -20%, rgba(255,93,59,.22), transparent 60%),
+      radial-gradient(ellipse 80% 60% at 80% 0%, rgba(255,210,63,.12), transparent 55%);
+  }
+  header h1 {
+    font-size: clamp(1.9rem, 7vw, 3rem);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    line-height: 1.05;
+  }
+  header h1 .flash { color: var(--accent); }
+  header p.sub {
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: .95rem;
+  }
+  .submit-cta {
+    display: inline-block;
+    margin-top: 14px;
+    background: var(--accent);
+    color: #14150f;
+    font-weight: 800;
+    text-decoration: none;
+    padding: 10px 22px;
+    border-radius: 999px;
+    font-size: .95rem;
+  }
+  .submit-cta:active { transform: scale(.97); }
+
+  .wrap { max-width: 560px; margin: 0 auto; padding: 0 12px; }
+
+  /* boulder tabs */
+  .tabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 14px 2px 10px;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex: 0 0 auto;
+    background: var(--panel);
+    border: 1px solid #2a2e40;
+    color: var(--muted);
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: .9rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .tab.active {
+    background: var(--accent-2);
+    border-color: var(--accent-2);
+    color: #fff;
+  }
+
+  /* leaderboard rows */
+  .board { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+  .row {
+    display: grid;
+    grid-template-columns: 44px 1fr auto auto;
+    align-items: center;
+    gap: 10px;
+    background: var(--panel);
+    border: 1px solid #232738;
+    border-radius: var(--radius);
+    padding: 12px 14px;
+  }
+  .row .rank {
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: var(--muted);
+    text-align: center;
+  }
+  .row:nth-child(1) { border-color: rgba(255,210,63,.55); background: linear-gradient(90deg, rgba(255,210,63,.10), var(--panel) 55%); }
+  .row:nth-child(1) .rank { color: var(--accent); font-size: 1.4rem; }
+  .row:nth-child(2) .rank { color: #cfd4e4; }
+  .row:nth-child(3) .rank { color: #c98d5a; }
+  .row .who { min-width: 0; }
+  .row .name {
+    font-weight: 800;
+    font-size: 1.02rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .row .date { color: var(--muted); font-size: .78rem; margin-top: 2px; }
+  .row .time {
+    font-variant-numeric: tabular-nums;
+    font-weight: 900;
+    font-size: 1.15rem;
+    color: var(--good);
+  }
+  .row .watch {
+    background: var(--panel-2);
+    border: 1px solid #2c3147;
+    color: var(--text);
+    text-decoration: none;
+    font-size: .85rem;
+    font-weight: 700;
+    padding: 8px 12px;
+    border-radius: 10px;
+    white-space: nowrap;
+  }
+  .row .watch:active { transform: scale(.96); }
+
+  .empty, .error {
+    text-align: center;
+    color: var(--muted);
+    padding: 48px 20px;
+    line-height: 1.6;
+  }
+  .error { color: #ff8f7a; }
+
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: .78rem;
+    margin-top: 34px;
+    padding: 0 20px;
+    line-height: 1.7;
+  }
+
+  /* video modal */
+  .modal {
+    position: fixed; inset: 0;
+    background: rgba(5,6,10,.88);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 50;
+  }
+  .modal.open { display: flex; }
+  .modal .box {
+    width: 100%;
+    max-width: 520px;
+  }
+  .modal iframe {
+    width: 100%;
+    aspect-ratio: 9 / 14;
+    max-height: 72vh;
+    border: 0;
+    border-radius: var(--radius);
+    background: #000;
+  }
+  .modal .close {
+    display: block;
+    margin: 14px auto 0;
+    background: var(--panel-2);
+    color: var(--text);
+    border: 1px solid #2c3147;
+    border-radius: 999px;
+    padding: 10px 26px;
+    font-weight: 700;
+    font-size: .95rem;
+    cursor: pointer;
+  }
+
+  @media (prefers-color-scheme: light) {
+    /* stays dark on purpose — gym wall poster vibe. remove this comment if you add a light theme */
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Speed <span class="flash">Wall</span></h1>
+  <p class="sub">Najhitrejši potrjeni vzponi. Posnemi, ali pa se ni zgodilo. 🎥</p>
+  <a class="submit-cta" id="submitBtn" href="#" target="_blank" rel="noopener">Oddaj svoj čas →</a>
+</header>
+
+<div class="wrap">
+  <div class="tabs" id="tabs"></div>
+  <div class="board" id="board">
+    <div class="empty">Nalagam čase…</div>
+  </div>
+  <footer>
+    Čas šteje šele, ko organizator preveri video.<br>
+    Prikazan je najboljši čas vsakega plezalca. Srečno. 🧗
+  </footer>
+</div>
+
+<div class="modal" id="modal">
+  <div class="box">
+    <iframe id="videoFrame" allow="autoplay; fullscreen" allowfullscreen></iframe>
+    <button class="close" id="closeModal">Zapri</button>
+  </div>
+</div>
+
+<script>
+/* ================= CONFIG ================= */
+
+// 1. In Google Sheets: File → Share → Publish to web → select the
+//    form-responses tab → CSV → publish, then paste the URL here:
+const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbh-oxTEA4UUKyq4zjzWMB6Kuv50Kk2ggvVshs-1eNRITekNlTbLiQWzj3OJyKcApjt3c1meVtfiqF/pub?output=csv";
+
+// 2. Link to your Google Form (the "Submit your time" button):
+const FORM_URL = "https://docs.google.com/forms/d/1z6sPQHyzv2hEeM7lncZbpxmWOyNZKaVgK7IvvCw5WUs/viewform";
+
+// 3. Column headers as they appear in row 1 of your sheet.
+//    Matching is case-insensitive and only needs to CONTAIN these words,
+//    so "What is your name?" matches "name".
+const COLUMNS = {
+  name:     "ime",
+  boulder:  "balvan",    // add a "Balvan" question to the form if you run more than one boulder
+  time:     "cas",
+  video:    "video",
+  verified: "verified",  // extra column YOU add in the sheet; put an x / yes / ✅ to approve
+};
+
+/* ============== END OF CONFIG ============== */
+
+const $ = (id) => document.getElementById(id);
+$("submitBtn").href = FORM_URL;
+
+// tiny CSV parser that handles quoted fields with commas/newlines
+function parseCSV(text) {
+  const rows = [];
+  let row = [], field = "", inQ = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQ) {
+      if (c === '"') {
+        if (text[i + 1] === '"') { field += '"'; i++; }
+        else inQ = false;
+      } else field += c;
+    } else if (c === '"') inQ = true;
+    else if (c === ",") { row.push(field); field = ""; }
+    else if (c === "\n" || c === "\r") {
+      if (c === "\r" && text[i + 1] === "\n") i++;
+      row.push(field); field = "";
+      if (row.some(f => f !== "")) rows.push(row);
+      row = [];
+    } else field += c;
+  }
+  row.push(field);
+  if (row.some(f => f !== "")) rows.push(row);
+  return rows;
+}
+
+// "12.34" -> 12.34s ; "1:23.4" -> 83.4s ; "0:58" -> 58s
+function parseTime(str) {
+  str = String(str).trim().replace(",", ".");
+  if (!str) return NaN;
+  const parts = str.split(":").map(Number);
+  if (parts.some(isNaN)) return NaN;
+  return parts.reduce((acc, p) => acc * 60 + p, 0);
+}
+
+function formatTime(s) {
+  if (s >= 60) {
+    const m = Math.floor(s / 60);
+    const rest = (s - m * 60).toFixed(2).padStart(5, "0");
+    return `${m}:${rest}`;
+  }
+  return s.toFixed(2) + "s";
+}
+
+// turn any Drive link into an embeddable /preview URL
+function drivePreview(url) {
+  const m = String(url).match(/[-\w]{25,}/);
+  return m ? `https://drive.google.com/file/d/${m[0]}/preview` : null;
+}
+
+function findCol(headers, needle) {
+  const n = needle.toLowerCase();
+  return headers.findIndex(h => h.toLowerCase().includes(n));
+}
+
+let entries = [], boulders = [], activeBoulder = null;
+
+async function load() {
+  if (SHEET_CSV_URL.startsWith("PASTE_")) {
+    $("board").innerHTML =
+      '<div class="error">Not configured yet — the organizer needs to set SHEET_CSV_URL inside index.html.</div>';
+    return;
+  }
+  let text;
+  try {
+    const res = await fetch(SHEET_CSV_URL, { cache: "no-store" });
+    if (!res.ok) throw new Error(res.status);
+    text = await res.text();
+  } catch (e) {
+    $("board").innerHTML =
+      '<div class="error">Lestvice ni bilo mogoče naložiti. Preveri povezavo in osveži stran.</div>';
+    return;
+  }
+
+  const rows = parseCSV(text);
+  if (rows.length < 2) { render([]); return; }
+
+  const headers = rows[0];
+  const col = {
+    name:     findCol(headers, COLUMNS.name),
+    boulder:  findCol(headers, COLUMNS.boulder),
+    time:     findCol(headers, COLUMNS.time),
+    video:    findCol(headers, COLUMNS.video),
+    verified: findCol(headers, COLUMNS.verified),
+    stamp:    findCol(headers, "timestamp"),
+  };
+
+  entries = rows.slice(1).map(r => ({
+    name: (r[col.name] || "").trim(),
+    boulder: col.boulder >= 0 ? (r[col.boulder] || "").trim() : "",
+    seconds: parseTime(r[col.time]),
+    video: col.video >= 0 ? (r[col.video] || "").trim() : "",
+    verified: col.verified >= 0 && /\S/.test(r[col.verified] || ""),
+    date: col.stamp >= 0 ? (r[col.stamp] || "").split(" ")[0] : "",
+  })).filter(e => e.name && !isNaN(e.seconds) && e.verified);
+
+  // best time per climber (per boulder)
+  const best = new Map();
+  for (const e of entries) {
+    const k = e.name.toLowerCase() + "|" + e.boulder.toLowerCase();
+    if (!best.has(k) || e.seconds < best.get(k).seconds) best.set(k, e);
+  }
+  entries = [...best.values()].sort((a, b) => a.seconds - b.seconds);
+
+  boulders = [...new Set(entries.map(e => e.boulder).filter(Boolean))];
+  if (activeBoulder === null) activeBoulder = boulders[0] ?? "";
+  renderTabs();
+  render(entries);
+}
+
+function renderTabs() {
+  const tabs = $("tabs");
+  if (boulders.length < 2) { tabs.style.display = "none"; return; }
+  tabs.style.display = "";
+  tabs.innerHTML = "";
+  for (const b of boulders) {
+    const btn = document.createElement("button");
+    btn.className = "tab" + (b === activeBoulder ? " active" : "");
+    btn.textContent = b;
+    btn.onclick = () => { activeBoulder = b; renderTabs(); render(entries); };
+    tabs.appendChild(btn);
+  }
+}
+
+function render(list) {
+  const board = $("board");
+  const shown = boulders.length >= 2 ? list.filter(e => e.boulder === activeBoulder) : list;
+  if (!shown.length) {
+    board.innerHTML =
+      '<div class="empty">Še ni potrjenih časov.<br>Bodi prvo ime na steni. 🥇</div>';
+    return;
+  }
+  board.innerHTML = "";
+  shown.forEach((e, i) => {
+    const row = document.createElement("div");
+    row.className = "row";
+    const medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : (i + 1);
+    const preview = drivePreview(e.video);
+    row.innerHTML = `
+      <div class="rank">${medal}</div>
+      <div class="who">
+        <div class="name"></div>
+        <div class="date">${e.date}</div>
+      </div>
+      <div class="time">${formatTime(e.seconds)}</div>
+      ${preview
+        ? `<a class="watch" href="#" data-v="${preview}">▶ video</a>`
+        : e.video
+          ? `<a class="watch" href="${e.video}" target="_blank" rel="noopener">▶ video</a>`
+          : `<span></span>`}`;
+    row.querySelector(".name").textContent = e.name;
+    const w = row.querySelector(".watch[data-v]");
+    if (w) w.onclick = (ev) => { ev.preventDefault(); openVideo(w.dataset.v); };
+    board.appendChild(row);
+  });
+}
+
+function openVideo(src) {
+  $("videoFrame").src = src;
+  $("modal").classList.add("open");
+}
+$("closeModal").onclick = () => {
+  $("modal").classList.remove("open");
+  $("videoFrame").src = "";
+};
+$("modal").onclick = (e) => { if (e.target === $("modal")) $("closeModal").click(); };
+
+load();
+setInterval(load, 60_000); // refresh every minute for people idling on the page
+</script>
+</body>
+</html>
