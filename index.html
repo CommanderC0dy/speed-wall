@@ -147,21 +147,11 @@
     border-radius: var(--radius);
     padding: 4px 16px;
   }
-  .rules summary {
-    cursor: pointer;
+  .rules h2 {
     font-weight: 800;
     font-size: 1rem;
-    padding: 12px 0;
-    list-style: none;
+    padding: 12px 0 6px;
   }
-  .rules summary::-webkit-details-marker { display: none; }
-  .rules summary::after {
-    content: "▾";
-    float: right;
-    color: var(--muted);
-    transition: transform .2s;
-  }
-  .rules[open] summary::after { transform: rotate(180deg); }
   .rules ol {
     margin: 2px 0 14px;
     padding-left: 20px;
@@ -250,8 +240,8 @@
   <div class="board" id="board">
     <div class="empty">Nalagam čase…</div>
   </div>
-  <details class="rules">
-    <summary>📜 Pravila</summary>
+  <section class="rules">
+    <h2>📜 Pravila</h2>
     <ol>
       <li><b>Start:</b> začneš v pravilnem startnem položaju — obe roki na startnem grifu. Čas začne teči v trenutku, ko spustiš startni grif.</li>
       <li><b>Cilj:</b> čas se ustavi, ko vzpostaviš kontrolo nad zadnjim (top) grifom z <b>obema rokama</b>. Dotik ni dovolj — top mora biti pod kontrolo.</li>
@@ -261,7 +251,7 @@
       <li><b>Poskusi:</b> število poskusov je neomejeno — šteje tvoj najboljši veljaven čas.</li>
       <li>Organizator pregleda vsak video; njegova odločitev je dokončna. 🤝</li>
     </ol>
-  </details>
+  </section>
   <footer>
     Čas šteje šele, ko organizator preveri video.<br>
     Prikazan je najboljši čas vsakega plezalca. Srečno. 🧗
@@ -284,7 +274,7 @@
 const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbh-oxTEA4UUKyq4zjzWMB6Kuv50Kk2ggvVshs-1eNRITekNlTbLiQWzj3OJyKcApjt3c1meVtfiqF/pub?output=csv";
 
 // 2. Link to your Google Form (the "Submit your time" button):
-const FORM_URL = "https://docs.google.com/forms/d/1z6sPQHyzv2hEeM7lncZbpxmWOyNZKaVgK7IvvCw5WUs/viewform";
+const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSf_4VneScjXhm7EebUgWCMA0EEBkdxq1wTK92HQijr_wocTyg/viewform";
 
 // 3. Column headers as they appear in row 1 of your sheet.
 //    Matching is case-insensitive and only needs to CONTAIN these words,
