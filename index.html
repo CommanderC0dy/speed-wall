@@ -276,8 +276,9 @@ function parseCSV(text) {
 }
 
 // "12.34" -> 12.34s ; "1:23.4" -> 83.4s ; "0:58" -> 58s
+// tolerant of text around the number: "30sekund" -> 30, "12,5 s" -> 12.5
 function parseTime(str) {
-  str = String(str).trim().replace(",", ".");
+  str = String(str).trim().replace(",", ".").replace(/[^\d:.]/g, "");
   if (!str) return NaN;
   const parts = str.split(":").map(Number);
   if (parts.some(isNaN)) return NaN;
