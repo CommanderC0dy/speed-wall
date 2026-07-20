@@ -275,14 +275,31 @@ function parseCSV(text) {
   return rows;
 }
 
-// "12.34" -> 12.34s ; "1:23.4" -> 83.4s ; "0:58" -> 58s
-// tolerant of text around the number: "30sekund" -> 30, "12,5 s" -> 12.5
-function parseTime(str) {
-  str = String(str).trim().replace(",", ".").replace(/[^\d:.]/g, "");
+// Accepts: "12.34", "12,34", "1:23.4", "0:58", "30sekund", "12,5 s",
+// "1min 30", "2 minuti", "1m05s". Rejects nonsense and absurd values.
+function parseTime(raw) {
+  let str = String(raw ?? "").trim().toLowerCase().replace(/,/g, ".");
   if (!str) return NaN;
-  const parts = str.split(":").map(Number);
-  if (parts.some(isNaN)) return NaN;
-  return parts.reduce((acc, p) => acc * 60 + p, 0);
+  let t;
+  // "1min 30", "1 minuta 5 s", "2min", "1m05s"
+  const m = str.match(/^(\d+(?:\.\d+)?)\s*m(?:in\w*)?\s*(\d+(?:\.\d+)?)?\s*(?:s\w*)?\.?$/);
+  if (m) {
+    t = parseFloat(m[1]) * 60 + (m[2] ? parseFloat(m[2]) : 0);
+  } else {
+    str = str.replace(/[^\d:.]/g, "");
+    if (!/\d/.test(str)) return NaN;
+    const parts = str.split(":").map(p => p === "" ? NaN : Number(p));
+    if (parts.some(isNaN)) return NaN;
+    t = parts.reduce((acc, p) => acc * 60 + p, 0);
+  }
+  // sanity bounds: nobody climbs in 0s, and over an hour is a typo
+  return t > 0 && t < 3600 ? t : NaN;
+}
+
+// "x", "yes", "ja", TRUE (checkbox) count; FALSE / no / ne / 0 / empty do not
+function isVerified(v) {
+  v = String(v ?? "").trim().toLowerCase();
+  return !!v && !["false", "no", "ne", "n", "0", "-"].includes(v);
 }
 
 function formatTime(s) {
@@ -294,9 +311,11 @@ function formatTime(s) {
   return s.toFixed(2) + "s";
 }
 
-// turn any Drive link into an embeddable /preview URL
+// turn a Drive link into an embeddable /preview URL; anything else -> null
 function drivePreview(url) {
-  const m = String(url).match(/[-\w]{25,}/);
+  url = String(url ?? "").trim();
+  if (!/^https?:\/\/(drive|docs)\.google\.com\//i.test(url)) return null;
+  const m = url.match(/[-\w]{25,}/);
   return m ? `https://drive.google.com/file/d/${m[0]}/preview` : null;
 }
 
@@ -342,14 +361,15 @@ async function load() {
     boulder: col.boulder >= 0 ? (r[col.boulder] || "").trim() : "",
     seconds: parseTime(r[col.time]),
     video: col.video >= 0 ? (r[col.video] || "").trim() : "",
-    verified: col.verified >= 0 && /\S/.test(r[col.verified] || ""),
+    verified: col.verified >= 0 && isVerified(r[col.verified]),
     date: col.stamp >= 0 ? (r[col.stamp] || "").split(" ")[0] : "",
   })).filter(e => e.name && !isNaN(e.seconds) && e.verified);
 
-  // best time per climber (per boulder)
+  // best time per climber (per boulder); "Ana Novak" and "ana  novak" are the same person
+  const norm = s => s.toLowerCase().replace(/\s+/g, " ").trim();
   const best = new Map();
   for (const e of entries) {
-    const k = e.name.toLowerCase() + "|" + e.boulder.toLowerCase();
+    const k = norm(e.name) + "|" + norm(e.boulder);
     if (!best.has(k) || e.seconds < best.get(k).seconds) best.set(k, e);
   }
   entries = [...best.values()].sort((a, b) => a.seconds - b.seconds);
@@ -387,22 +407,36 @@ function render(list) {
     const row = document.createElement("div");
     row.className = "row";
     const medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : (i + 1);
-    const preview = drivePreview(e.video);
     row.innerHTML = `
       <div class="rank">${medal}</div>
       <div class="who">
         <div class="name"></div>
-        <div class="date">${e.date}</div>
+        <div class="date"></div>
       </div>
-      <div class="time">${formatTime(e.seconds)}</div>
-      ${preview
-        ? `<a class="watch" href="#" data-v="${preview}">▶ video</a>`
-        : e.video
-          ? `<a class="watch" href="${e.video}" target="_blank" rel="noopener">▶ video</a>`
-          : `<span></span>`}`;
+      <div class="time">${formatTime(e.seconds)}</div>`;
     row.querySelector(".name").textContent = e.name;
-    const w = row.querySelector(".watch[data-v]");
-    if (w) w.onclick = (ev) => { ev.preventDefault(); openVideo(w.dataset.v); };
+    row.querySelector(".date").textContent = e.date;
+
+    // video button built via DOM so form input can never inject HTML
+    const preview = drivePreview(e.video);
+    const extUrl = /^https?:\/\//i.test(String(e.video ?? "").trim())
+      ? String(e.video).trim() : null;
+    if (preview || extUrl) {
+      const a = document.createElement("a");
+      a.className = "watch";
+      a.textContent = "▶ video";
+      if (preview) {
+        a.href = "#";
+        a.onclick = (ev) => { ev.preventDefault(); openVideo(preview); };
+      } else {
+        a.href = extUrl;
+        a.target = "_blank";
+        a.rel = "noopener";
+      }
+      row.appendChild(a);
+    } else {
+      row.appendChild(document.createElement("span"));
+    }
     board.appendChild(row);
   });
 }
