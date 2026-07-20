@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Speed Wall — plakat</title>
+<style>
+  @page { size: A4 portrait; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: #14150f;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .poster {
+    width: 210mm;
+    height: 297mm;
+    padding: 18mm 16mm;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .stripe {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 9mm;
+    background: repeating-linear-gradient(-45deg,
+      #ffd23f 0 14mm, #ff5d3b 14mm 28mm);
+  }
+  .stripe.bottom { top: auto; bottom: 0; }
+  h1 {
+    margin-top: 10mm;
+    font-size: 64pt;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    line-height: .95;
+  }
+  h1 .accent { color: #ff5d3b; }
+  .tagline {
+    margin-top: 4mm;
+    font-size: 17pt;
+    font-weight: 700;
+  }
+  .steps {
+    margin-top: 9mm;
+    font-size: 14pt;
+    line-height: 1.9;
+    text-align: left;
+    font-weight: 500;
+  }
+  .steps b { font-weight: 800; }
+  .qr {
+    margin-top: 9mm;
+    width: 88mm;
+    height: 88mm;
+    padding: 5mm;
+    border: 2.2mm solid #14150f;
+    border-radius: 8mm;
+  }
+  .qr img { width: 100%; height: 100%; display: block; }
+  .scanme {
+    margin-top: 4mm;
+    font-size: 20pt;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+  .url {
+    margin-top: 2mm;
+    font-size: 11pt;
+    color: #555;
+    font-family: ui-monospace, monospace;
+  }
+  .fine {
+    margin-top: auto;
+    margin-bottom: 12mm;
+    font-size: 10pt;
+    color: #777;
+    line-height: 1.6;
+  }
+  @media print {
+    body { background: #fff; }
+    .poster { box-shadow: none; }
+  }
+  @media screen {
+    body { background: #e8e8e8; padding: 20px 0; }
+    .poster { box-shadow: 0 4px 30px rgba(0,0,0,.25); background: #fff; }
+  }
+</style>
+</head>
+<body>
+<div class="poster">
+  <div class="stripe"></div>
+  <h1>Speed<br><span class="accent">Wall</span> ⏱️</h1>
+  <p class="tagline">Kdo najhitreje spleza balvan?</p>
+  <div class="steps">
+    1️⃣ <b>Posnemi</b> svoj vzpon (naj te nekdo štopa in snema)<br>
+    2️⃣ <b>Oddaj</b> čas + video prek obrazca na strani<br>
+    3️⃣ Ko organizator preveri video, si <b>na lestvici</b> 🏆
+  </div>
+  <div class="qr"><img src="qr.svg" alt="QR koda do lestvice"></div>
+  <div class="scanme">Skeniraj za lestvico</div>
+  <div class="url">commanderc0dy.github.io/speed-wall</div>
+  <p class="fine">
+    Za oddajo videa moraš biti prijavljen v Google račun.<br>
+    Video naj zajame samo vzpon — od starta do vrha. Brez videa čas ne šteje!
+  </p>
+  <div class="stripe bottom"></div>
+</div>
+</body>
+</html>
