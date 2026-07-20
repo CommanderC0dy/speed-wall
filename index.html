@@ -363,7 +363,10 @@ function drivePreview(url) {
 
 function findCol(headers, needle) {
   const n = needle.toLowerCase();
-  return headers.findIndex(h => h.toLowerCase().includes(n));
+  const clean = headers.map(h => String(h).trim().toLowerCase());
+  const exact = clean.findIndex(h => h === n);
+  if (exact >= 0) return exact;           // "Ime" beats "Timestamp" containing "ime"
+  return clean.findIndex(h => h.includes(n));
 }
 
 let entries = [], boulders = [], activeBoulder = null;
