@@ -375,7 +375,12 @@ async function load() {
   entries = [...best.values()].sort((a, b) => a.seconds - b.seconds);
 
   boulders = [...new Set(entries.map(e => e.boulder).filter(Boolean))];
-  if (activeBoulder === null) activeBoulder = boulders[0] ?? "";
+  if (activeBoulder === null) {
+    // #rdeci in the URL opens directly on the "Rdeči" tab (accents/case ignored)
+    const slug = s => s.toLowerCase().normalize("NFD").replace(/[^a-z0-9]/g, "");
+    const hash = slug(decodeURIComponent(location.hash.slice(1)));
+    activeBoulder = (hash && boulders.find(b => slug(b) === hash)) ?? boulders[0] ?? "";
+  }
   renderTabs();
   render(entries);
 }
@@ -389,7 +394,11 @@ function renderTabs() {
     const btn = document.createElement("button");
     btn.className = "tab" + (b === activeBoulder ? " active" : "");
     btn.textContent = b;
-    btn.onclick = () => { activeBoulder = b; renderTabs(); render(entries); };
+    btn.onclick = () => {
+      activeBoulder = b;
+      history.replaceState(null, "", "#" + encodeURIComponent(b.toLowerCase().normalize("NFD").replace(/[^a-z0-9]/g, "")));
+      renderTabs(); render(entries);
+    };
     tabs.appendChild(btn);
   }
 }
