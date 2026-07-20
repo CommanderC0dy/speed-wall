@@ -96,10 +96,9 @@
     text-decoration: none;
     padding: 13px 22px;
     border-radius: var(--r);
-    transition: filter .15s var(--ease-out), transform .1s var(--ease-out);
+    transition: filter .15s var(--ease-out), transform 160ms var(--ease-out);
   }
-  .submit-cta:hover { filter: brightness(1.08); }
-  .submit-cta:active { transform: translateY(1px); }
+  .submit-cta:active { transform: scale(.97); }
 
   /* boulder tabs */
   .tabs {
@@ -123,9 +122,10 @@
     font-size: .88rem;
     font-weight: 700;
     cursor: pointer;
-    transition: border-color .15s var(--ease-out), color .15s var(--ease-out);
+    transition: border-color .15s var(--ease-out), color .15s var(--ease-out),
+                transform 160ms var(--ease-out);
   }
-  .tab:hover { border-color: var(--line-strong); color: var(--text); }
+  .tab:active { transform: scale(.97); }
   .tab.active {
     background: var(--accent);
     border-color: var(--accent);
@@ -193,10 +193,17 @@
     padding: 8px 0;
     border-radius: var(--r);
     white-space: nowrap;
-    transition: border-color .15s var(--ease-out), transform .1s var(--ease-out);
+    transition: border-color .15s var(--ease-out), transform 160ms var(--ease-out);
   }
-  .row .watch:hover { border-color: var(--line-strong); }
-  .row .watch:active { transform: translateY(1px); }
+  .row .watch:active { transform: scale(.97); }
+
+  /* hover is a pointer concept; on touch it just sticks after tap */
+  @media (hover: hover) and (pointer: fine) {
+    .submit-cta:hover { filter: brightness(1.08); }
+    .tab:hover { border-color: var(--line-strong); color: var(--text); }
+    .row .watch:hover { border-color: var(--line-strong); }
+    .modal .close:hover { border-color: var(--muted); }
+  }
 
   /* first-load entrance; later refreshes render without it */
   .row.in {
@@ -274,7 +281,8 @@
     z-index: 50;
     opacity: 0;
     visibility: hidden;
-    transition: opacity .2s var(--ease-out), visibility 0s linear .2s;
+    /* exit: quicker than enter, the system is responding, not presenting */
+    transition: opacity .15s var(--ease-out), visibility 0s linear .15s;
   }
   .modal.open {
     opacity: 1;
@@ -285,9 +293,12 @@
     width: 100%;
     max-width: 520px;
     transform: translateY(10px);
+    transition: transform .15s var(--ease-out);
+  }
+  .modal.open .box {
+    transform: none;
     transition: transform .25s var(--ease-out);
   }
-  .modal.open .box { transform: none; }
   .modal .vtitle {
     text-align: center;
     font-weight: 800;
@@ -314,14 +325,17 @@
     font-weight: 700;
     font-size: .95rem;
     cursor: pointer;
-    transition: border-color .15s var(--ease-out);
+    transition: border-color .15s var(--ease-out), transform 160ms var(--ease-out);
   }
-  .modal .close:hover { border-color: var(--muted); }
+  .modal .close:active { transform: scale(.97); }
 
+  /* reduced motion: drop movement, keep the opacity fades that aid comprehension */
   @media (prefers-reduced-motion: reduce) {
     .row.in { animation: none; }
     .sk { animation: none; }
-    .modal, .modal .box, .submit-cta, .tab, .row, .row .watch { transition: none; }
+    .submit-cta, .tab, .row .watch, .modal .close { transition: none; transform: none; }
+    .submit-cta:active, .tab:active, .row .watch:active, .modal .close:active { transform: none; }
+    .modal .box, .modal.open .box { transform: none; transition: none; }
   }
 </style>
 </head>
