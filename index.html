@@ -4,163 +4,206 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Speed Wall — Lestvica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400..900&display=swap" rel="stylesheet">
 <style>
   /* ============================================================
      CONFIG IS IN THE <script> AT THE BOTTOM — set SHEET_CSV_URL
      ============================================================ */
   :root {
-    --bg: #0e0f13;
-    --panel: #171922;
-    --panel-2: #1e2130;
-    --text: #f2f3f7;
-    --muted: #9aa0b4;
+    --bg: #0d0e12;
+    --panel: #16181f;
+    --panel-2: #1d2029;
+    --line: #262a36;
+    --line-soft: #20242f;
+    --text: #f4f5f8;
+    --muted: #a3a9bc;
     --accent: #ffd23f;      /* chalk-bag yellow */
     --accent-2: #ff5d3b;    /* hold orange */
-    --good: #4ade80;
+    --ink-on-accent: #17140a;
+    --gold: #ffd23f;
+    --silver: #c9cfdd;
+    --bronze: #d08b55;
     --radius: 14px;
+    --ease-out: cubic-bezier(.22, 1, .36, 1);
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; }
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-family: "Archivo", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     min-height: 100vh;
-    padding-bottom: 60px;
+    padding-bottom: 56px;
+  }
+
+  a, button { font-family: inherit; }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* poster stripe — same motif as the printed plakat */
+  .stripe {
+    height: 6px;
+    background: repeating-linear-gradient(-45deg,
+      var(--accent) 0 14px, var(--accent-2) 14px 28px);
   }
 
   header {
-    padding: 28px 16px 18px;
+    padding: 34px 16px 22px;
     text-align: center;
-    background:
-      radial-gradient(ellipse 120% 80% at 50% -20%, rgba(255,93,59,.22), transparent 60%),
-      radial-gradient(ellipse 80% 60% at 80% 0%, rgba(255,210,63,.12), transparent 55%);
   }
   header h1 {
-    font-size: clamp(1.9rem, 7vw, 3rem);
+    font-size: clamp(2.4rem, 9vw, 3.4rem);
     font-weight: 900;
     letter-spacing: -0.02em;
     text-transform: uppercase;
-    line-height: 1.05;
+    line-height: .95;
+    text-wrap: balance;
   }
   header h1 .flash { color: var(--accent); }
   header p.sub {
-    margin-top: 8px;
+    margin-top: 10px;
     color: var(--muted);
     font-size: .95rem;
+    font-weight: 500;
   }
   .submit-cta {
     display: inline-block;
-    margin-top: 14px;
+    margin-top: 18px;
     background: var(--accent);
-    color: #14150f;
+    color: var(--ink-on-accent);
     font-weight: 800;
     text-decoration: none;
-    padding: 10px 22px;
+    padding: 12px 26px;
     border-radius: 999px;
     font-size: .95rem;
+    transition: transform .15s var(--ease-out), filter .15s var(--ease-out);
   }
+  .submit-cta:hover { filter: brightness(1.07); }
   .submit-cta:active { transform: scale(.97); }
 
-  .wrap { max-width: 560px; margin: 0 auto; padding: 0 12px; }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 0 14px; }
 
   /* boulder tabs */
   .tabs {
     display: flex;
     gap: 8px;
     overflow-x: auto;
-    padding: 14px 2px 10px;
+    padding: 16px 2px 12px;
     scrollbar-width: none;
   }
   .tabs::-webkit-scrollbar { display: none; }
+  @media (min-width: 640px) {
+    .tabs { flex-wrap: wrap; overflow: visible; }
+  }
   .tab {
     flex: 0 0 auto;
     background: var(--panel);
-    border: 1px solid #2a2e40;
+    border: 1px solid var(--line);
     color: var(--muted);
-    padding: 8px 16px;
+    padding: 9px 16px;
     border-radius: 999px;
     font-size: .9rem;
     font-weight: 700;
     cursor: pointer;
+    transition: border-color .15s var(--ease-out), color .15s var(--ease-out);
   }
+  .tab:hover { border-color: #3a4054; color: var(--text); }
   .tab.active {
-    background: var(--accent-2);
-    border-color: var(--accent-2);
-    color: #fff;
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--ink-on-accent);
   }
 
   /* leaderboard rows */
   .board { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
   .row {
     display: grid;
-    grid-template-columns: 44px 1fr auto auto;
+    grid-template-columns: 40px 1fr auto auto;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     background: var(--panel);
-    border: 1px solid #232738;
+    border: 1px solid var(--line-soft);
     border-radius: var(--radius);
-    padding: 12px 14px;
+    padding: 13px 15px;
+    transition: border-color .15s var(--ease-out);
+  }
+  @media (hover: hover) {
+    .row:hover { border-color: var(--line); }
   }
   .row .rank {
-    font-size: 1.15rem;
-    font-weight: 900;
+    font-size: 1.05rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
     color: var(--muted);
     text-align: center;
   }
-  .row:nth-child(1) { border-color: rgba(255,210,63,.55); background: linear-gradient(90deg, rgba(255,210,63,.10), var(--panel) 55%); }
-  .row:nth-child(1) .rank { color: var(--accent); font-size: 1.4rem; }
-  .row:nth-child(2) .rank { color: #cfd4e4; }
-  .row:nth-child(3) .rank { color: #c98d5a; }
+  .row.r1 { border-color: rgba(255, 210, 63, .45); }
+  .row.r1 .rank { color: var(--gold); font-size: 1.25rem; }
+  .row.r2 .rank { color: var(--silver); font-size: 1.15rem; }
+  .row.r3 .rank { color: var(--bronze); font-size: 1.1rem; }
   .row .who { min-width: 0; }
   .row .name {
-    font-weight: 800;
-    font-size: 1.02rem;
+    font-weight: 700;
+    font-size: 1rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .row .date { color: var(--muted); font-size: .78rem; margin-top: 2px; }
+  .row .date { color: var(--muted); font-size: .8rem; margin-top: 3px; }
   .row .time {
     font-variant-numeric: tabular-nums;
-    font-weight: 900;
-    font-size: 1.15rem;
-    color: var(--good);
+    font-weight: 800;
+    font-size: 1.2rem;
+    letter-spacing: -0.01em;
   }
+  .row.r1 .time { color: var(--gold); }
   .row .watch {
-    background: var(--panel-2);
-    border: 1px solid #2c3147;
+    background: transparent;
+    border: 1px solid var(--line);
     color: var(--text);
     text-decoration: none;
     font-size: .85rem;
     font-weight: 700;
-    padding: 8px 12px;
+    padding: 8px 13px;
     border-radius: 10px;
     white-space: nowrap;
+    transition: border-color .15s var(--ease-out), background .15s var(--ease-out),
+                transform .1s var(--ease-out);
   }
+  .row .watch:hover { border-color: #3a4054; background: var(--panel-2); }
   .row .watch:active { transform: scale(.96); }
 
-  .rules {
-    margin-top: 22px;
-    background: var(--panel);
-    border: 1px solid #232738;
-    border-radius: var(--radius);
-    padding: 4px 16px;
+  /* first-load entrance; later refreshes render without it */
+  .row.in {
+    animation: rise .4s var(--ease-out) both;
+    animation-delay: calc(var(--i) * 45ms);
   }
-  .rules h2 {
-    font-weight: 800;
-    font-size: 1rem;
-    padding: 12px 0 6px;
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: none; }
   }
-  .rules ol {
-    margin: 2px 0 14px;
-    padding-left: 20px;
-    color: var(--muted);
-    font-size: .92rem;
-    line-height: 1.65;
+
+  /* skeleton loading */
+  .sk {
+    border-radius: 6px;
+    background: linear-gradient(90deg, var(--panel-2) 25%, #252938 50%, var(--panel-2) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.3s linear infinite;
   }
-  .rules ol li { margin-bottom: 8px; }
-  .rules ol b { color: var(--text); }
+  @keyframes shimmer {
+    from { background-position: 200% 0; }
+    to   { background-position: -200% 0; }
+  }
+  .sk-rank { width: 22px; height: 22px; margin: 0 auto; }
+  .sk-name { width: 40%; height: 14px; }
+  .sk-date { width: 25%; height: 10px; margin-top: 7px; }
+  .sk-time { width: 56px; height: 20px; }
+  .sk-btn  { width: 64px; height: 32px; border-radius: 10px; }
 
   .empty, .error {
     text-align: center;
@@ -170,11 +213,35 @@
   }
   .error { color: #ff8f7a; }
 
+  /* rules */
+  .rules {
+    margin-top: 26px;
+    background: var(--panel);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius);
+    padding: 18px 20px 8px;
+  }
+  .rules h2 {
+    font-weight: 800;
+    font-size: 1.05rem;
+    letter-spacing: -0.01em;
+    padding-bottom: 10px;
+  }
+  .rules ol {
+    padding-left: 22px;
+    color: var(--muted);
+    font-size: .92rem;
+    line-height: 1.65;
+  }
+  .rules ol li { margin-bottom: 10px; padding-left: 4px; }
+  .rules ol li::marker { color: var(--accent); font-weight: 800; }
+  .rules ol b { color: var(--text); }
+
   footer {
     text-align: center;
     color: var(--muted);
-    font-size: .78rem;
-    margin-top: 34px;
+    font-size: .8rem;
+    margin-top: 30px;
     padding: 0 20px;
     line-height: 1.7;
   }
@@ -182,25 +249,35 @@
   /* video modal */
   .modal {
     position: fixed; inset: 0;
-    background: rgba(5,6,10,.88);
-    display: none;
+    background: rgba(6, 7, 11, .88);
+    display: flex;
     align-items: center;
     justify-content: center;
     padding: 16px;
     z-index: 50;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .2s var(--ease-out), visibility 0s linear .2s;
   }
-  .modal.open { display: flex; }
+  .modal.open {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity .2s var(--ease-out);
+  }
   .modal .box {
     width: 100%;
     max-width: 520px;
+    transform: translateY(12px);
+    transition: transform .25s var(--ease-out);
   }
+  .modal.open .box { transform: none; }
   .modal .vtitle {
     text-align: center;
-    font-weight: 900;
-    font-size: 1.1rem;
-    margin-bottom: 10px;
+    font-weight: 800;
+    font-size: 1.05rem;
+    margin-bottom: 12px;
   }
-  .modal .vtitle .t { color: var(--good); font-variant-numeric: tabular-nums; }
+  .modal .vtitle .t { color: var(--accent); font-variant-numeric: tabular-nums; }
   .modal iframe {
     width: 100%;
     aspect-ratio: 9 / 14;
@@ -214,34 +291,43 @@
     margin: 14px auto 0;
     background: var(--panel-2);
     color: var(--text);
-    border: 1px solid #2c3147;
+    border: 1px solid var(--line);
     border-radius: 999px;
-    padding: 10px 26px;
+    padding: 10px 28px;
     font-weight: 700;
     font-size: .95rem;
     cursor: pointer;
+    transition: border-color .15s var(--ease-out);
   }
+  .modal .close:hover { border-color: #3a4054; }
 
-  @media (prefers-color-scheme: light) {
-    /* stays dark on purpose — gym wall poster vibe. remove this comment if you add a light theme */
+  @media (prefers-reduced-motion: reduce) {
+    .row.in { animation: none; }
+    .sk { animation: none; }
+    .modal, .modal .box, .submit-cta, .tab, .row, .row .watch { transition: none; }
   }
 </style>
 </head>
 <body>
 
+<div class="stripe" aria-hidden="true"></div>
+
 <header>
   <h1>Speed <span class="flash">Wall</span></h1>
-  <p class="sub">Najhitrejši potrjeni vzponi. Posnemi, ali pa se ni zgodilo. 🎥</p>
+  <p class="sub">Najhitrejši potrjeni vzponi. Posnemi, ali pa se ni zgodilo.</p>
   <a class="submit-cta" id="submitBtn" href="#" target="_blank" rel="noopener">Oddaj svoj čas →</a>
 </header>
 
 <div class="wrap">
-  <div class="tabs" id="tabs"></div>
-  <div class="board" id="board">
-    <div class="empty">Nalagam čase…</div>
+  <div class="tabs" id="tabs" hidden></div>
+  <div class="board" id="board" aria-live="polite">
+    <div class="row"><div class="sk sk-rank"></div><div class="who"><div class="sk sk-name"></div><div class="sk sk-date"></div></div><div class="sk sk-time"></div><div class="sk sk-btn"></div></div>
+    <div class="row"><div class="sk sk-rank"></div><div class="who"><div class="sk sk-name"></div><div class="sk sk-date"></div></div><div class="sk sk-time"></div><div class="sk sk-btn"></div></div>
+    <div class="row"><div class="sk sk-rank"></div><div class="who"><div class="sk sk-name"></div><div class="sk sk-date"></div></div><div class="sk sk-time"></div><div class="sk sk-btn"></div></div>
   </div>
+
   <section class="rules">
-    <h2>📜 Pravila</h2>
+    <h2>Pravila</h2>
     <ol>
       <li><b>Start:</b> začneš v pravilnem startnem položaju — obe roki na startnem grifu. Čas začne teči v trenutku, ko spustiš startni grif.</li>
       <li><b>Cilj:</b> čas se ustavi, ko vzpostaviš kontrolo nad zadnjim (top) grifom z <b>obema rokama</b>. Dotik ni dovolj — top mora biti pod kontrolo.</li>
@@ -249,19 +335,20 @@
       <li><b>Brez dabov:</b> dotik tal ali sosednje stene med plezanjem = dab = poskus ne šteje.</li>
       <li><b>Video:</b> posnetek mora <b>brez rezov</b> zajeti celoten poskus od starta do topa, plezalec mora biti ves čas viden. Čas se odčita iz posnetka.</li>
       <li><b>Poskusi:</b> število poskusov je neomejeno — šteje tvoj najboljši veljaven čas.</li>
-      <li>Organizator pregleda vsak video; njegova odločitev je dokončna. 🤝</li>
+      <li>Organizator pregleda vsak video; njegova odločitev je dokončna.</li>
     </ol>
   </section>
+
   <footer>
     Čas šteje šele, ko organizator preveri video.<br>
-    Prikazan je najboljši čas vsakega plezalca. Srečno. 🧗
+    Prikazan je najboljši čas vsakega plezalca. Srečno.
   </footer>
 </div>
 
 <div class="modal" id="modal">
   <div class="box">
     <div class="vtitle" id="videoTitle"></div>
-    <iframe id="videoFrame" allow="autoplay; fullscreen" allowfullscreen></iframe>
+    <iframe id="videoFrame" title="Posnetek vzpona" allow="autoplay; fullscreen" allowfullscreen></iframe>
     <button class="close" id="closeModal">Zapri</button>
   </div>
 </div>
@@ -277,8 +364,7 @@ const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbh-oxTE
 const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSf_4VneScjXhm7EebUgWCMA0EEBkdxq1wTK92HQijr_wocTyg/viewform";
 
 // 3. Column headers as they appear in row 1 of your sheet.
-//    Matching is case-insensitive and only needs to CONTAIN these words,
-//    so "What is your name?" matches "name".
+//    Matching prefers an exact header, then case-insensitive contains.
 const COLUMNS = {
   name:     "ime",
   boulder:  "balvan",    // add a "Balvan" question to the form if you run more than one boulder
@@ -369,7 +455,7 @@ function findCol(headers, needle) {
   return clean.findIndex(h => h.includes(n));
 }
 
-let entries = [], boulders = [], activeBoulder = null;
+let entries = [], boulders = [], activeBoulder = null, firstRender = true;
 
 async function load() {
   if (SHEET_CSV_URL.startsWith("PASTE_")) {
@@ -424,7 +510,8 @@ async function load() {
     // #rdeci in the URL opens directly on the "Rdeči" tab (accents/case ignored)
     const slug = s => s.toLowerCase().normalize("NFD").replace(/[^a-z0-9]/g, "");
     const hash = slug(decodeURIComponent(location.hash.slice(1)));
-    activeBoulder = (hash && boulders.find(b => slug(b) === hash)) ?? boulders[0] ?? "";
+    const fromHash = hash ? boulders.find(b => slug(b) === hash) : undefined;
+    activeBoulder = fromHash ?? boulders[0] ?? "";
   }
   renderTabs();
   render(entries);
@@ -432,12 +519,13 @@ async function load() {
 
 function renderTabs() {
   const tabs = $("tabs");
-  if (boulders.length < 2) { tabs.style.display = "none"; return; }
-  tabs.style.display = "";
+  if (boulders.length < 2) { tabs.hidden = true; return; }
+  tabs.hidden = false;
   tabs.innerHTML = "";
   for (const b of boulders) {
     const btn = document.createElement("button");
     btn.className = "tab" + (b === activeBoulder ? " active" : "");
+    btn.setAttribute("aria-pressed", b === activeBoulder);
     btn.textContent = b;
     btn.onclick = () => {
       activeBoulder = b;
@@ -453,16 +541,19 @@ function render(list) {
   const shown = boulders.length >= 2 ? list.filter(e => e.boulder === activeBoulder) : list;
   if (!shown.length) {
     board.innerHTML =
-      '<div class="empty">Še ni potrjenih časov.<br>Bodi prvo ime na steni. 🥇</div>';
+      '<div class="empty">Še ni potrjenih časov.<br>Bodi prvo ime na steni.</div>';
     return;
   }
   board.innerHTML = "";
   shown.forEach((e, i) => {
     const row = document.createElement("div");
-    row.className = "row";
-    const medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : (i + 1);
+    row.className = "row" + (i < 3 ? ` r${i + 1}` : "");
+    if (firstRender) {
+      row.classList.add("in");
+      row.style.setProperty("--i", Math.min(i, 8));
+    }
     row.innerHTML = `
-      <div class="rank">${medal}</div>
+      <div class="rank">${i + 1}</div>
       <div class="who">
         <div class="name"></div>
         <div class="date"></div>
@@ -493,6 +584,7 @@ function render(list) {
     }
     board.appendChild(row);
   });
+  firstRender = false;
 }
 
 function openVideo(src, name, seconds) {
