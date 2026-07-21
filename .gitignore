@@ -1,0 +1,7 @@
+vision/.venv/
+vision/*.pt
+vision/*_openvino_model/
+vision/*.jpg
+vision/*.mp4
+vision/*.json
+__pycache__/
