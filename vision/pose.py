@@ -48,11 +48,14 @@ print("Click the START hold, then the FINISH hold. R resets, Q quits.")
 
 
 def wrists_of(result):
-    """All wrist positions of all people in frame, as (x, y) tuples."""
+    """Confidently-seen wrist positions of everyone in frame, as (x, y)."""
     pts = []
-    if result.keypoints is not None and result.keypoints.xy is not None:
-        for person in result.keypoints.xy:
+    kp = result.keypoints
+    if kp is not None and kp.xy is not None:
+        for pi, person in enumerate(kp.xy):
             for idx in (L_WRIST, R_WRIST):
+                if kp.conf is not None and float(kp.conf[pi][idx]) < 0.5:
+                    continue  # occluded/guessed keypoint
                 x, y = person[idx].tolist()
                 if x > 0 or y > 0:  # (0,0) means "not visible"
                     pts.append((x, y))

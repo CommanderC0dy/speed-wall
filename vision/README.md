@@ -22,6 +22,10 @@ the 640 one `yolo11n-pose-640_openvino_model` — export twice, rename between)
   start and finish hold, press S. Writes `wall_photo.holds.json`.
 - `judge.py` — time a submitted video: `judge.py wall_photo.holds.json video.mp4`.
   Prints the verdict and writes `judged_<video>.mp4` as proof.
+- `ghost.py` — ghost racing: `ghost.py wall.holds.json run.mp4 ghost.mp4`.
+  Overlays the ghost video's climber (magenta skeleton, warped through the
+  shared wall from any camera angle) onto the run video, time-aligned at the
+  moment each hand leaves the start hold. `--align frame0` for trimmed clips.
 
 The phone version of the live timer is `/timer.html` on the site
 (browser pose tracking via MediaPipe, needs HTTPS for camera access).

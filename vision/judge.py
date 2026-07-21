@@ -68,11 +68,17 @@ def project(H, pt):
     return (float(p[0] / p[2]), float(p[1] / p[2]))
 
 
+MIN_KP_CONF = 0.5  # keypoints below this are guesses (e.g. body parts out of frame)
+
+
 def wrists_of(result):
     pts = []
-    if result.keypoints is not None and result.keypoints.xy is not None:
-        for person in result.keypoints.xy:
+    kp = result.keypoints
+    if kp is not None and kp.xy is not None:
+        for pi, person in enumerate(kp.xy):
             for idx in (L_WRIST, R_WRIST):
+                if kp.conf is not None and float(kp.conf[pi][idx]) < MIN_KP_CONF:
+                    continue
                 x, y = person[idx].tolist()
                 if x > 0 or y > 0:
                     pts.append((x, y))
